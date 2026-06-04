@@ -15,9 +15,7 @@ Finished, tested locally, but don't deployed to testnet
 
 ### Set Up
 Install Foundry dependences:  
-```forge install foundry-rs/forge-std@v1.16.1 --no-git```  
-```forge install openzeppelin/openzeppelin-contracts@v5.6.1 --no-git```  
-```forge install cyfrin/foundry-era-contracts@0.0.3 --no-git```  
+```forge install```  
 
 ### Usage
 Basic Foundry commands: ```forge build```, ```forge test```  
