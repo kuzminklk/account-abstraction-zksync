@@ -11,7 +11,7 @@ ZKsynk native account abstraction
 
 
 ### Status
-Finished, tested locally, but don't deployed to testnet  
+Finished, tested locally, but didn't deployed to testnet  
 
 ### To-dos
 - Deploy to ZKsync testnet  
@@ -26,4 +26,4 @@ Basic Foundry commands: ```forge build```, ```forge test```
 Other appropriate commands in ```./commands.sh```  
 
 ### Deployment and interactions
-Don't do deployment for ZKsync as it doesn't support Foundry scripts  
+Didn't deployed to ZKsync testnet as it doesn't support Foundry scripts  
