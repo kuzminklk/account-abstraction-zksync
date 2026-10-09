@@ -1,37 +1,34 @@
-
-
-
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.28;
 
-
 // — External imports —
 
-import { console, Test } from "forge-std/Test.sol";
+import {console, Test} from "forge-std/Test.sol";
 
 // OpenZeppelin imports
-import { ERC20Mock } from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
-import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import { MessageHashUtils } from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
+import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
+import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
 // Foundry Era Contracts imports
-import { BOOTLOADER_FORMAL_ADDRESS } from "foundry-era-contracts/src/system-contracts/contracts/Constants.sol";
-import { ACCOUNT_VALIDATION_SUCCESS_MAGIC } from "foundry-era-contracts/src/system-contracts/contracts/interfaces/IAccount.sol";
-import { Transaction, MemoryTransactionHelper } from "foundry-era-contracts/src/system-contracts/contracts/libraries/MemoryTransactionHelper.sol";
-
+import {BOOTLOADER_FORMAL_ADDRESS} from "foundry-era-contracts/src/system-contracts/contracts/Constants.sol";
+import {
+	ACCOUNT_VALIDATION_SUCCESS_MAGIC
+} from "foundry-era-contracts/src/system-contracts/contracts/interfaces/IAccount.sol";
+import {
+	Transaction,
+	MemoryTransactionHelper
+} from "foundry-era-contracts/src/system-contracts/contracts/libraries/MemoryTransactionHelper.sol";
 
 // — Local imports —
 
-import { Account as AccountAbstraction } from "../src/Account.sol"; // Use alias because Account is an struct from forge-std/Script.sol …
-
-
+import {Account as AccountAbstraction} from "../src/Account.sol"; // Use alias because Account is an struct from forge-std/Script.sol …
 
 /**
- * @notice Tests for account abstraction
+ *	@notice Tests for account abstraction
  */
 contract AccountTest is Test {
-
 	using MessageHashUtils for bytes32;
 
 	uint256 constant TOKENS_AMOUNT_TO_MINT = 100e18; // 100 units with 18 decimal percision
@@ -46,7 +43,6 @@ contract AccountTest is Test {
 	AccountAbstraction public accountAbstractionContract;
 	ERC20Mock public usdc;
 
-
 	// − Functions —
 
 	function setUp() public {
@@ -57,46 +53,48 @@ contract AccountTest is Test {
 		console.log("With private key: ", ownerPrivateKey);
 
 		vm.startPrank(owner);
-			accountAbstractionContract = new AccountAbstraction();
-			usdc = new ERC20Mock();
+		accountAbstractionContract = new AccountAbstraction();
+		usdc = new ERC20Mock();
 		vm.stopPrank();
 
 		vm.deal(address(accountAbstractionContract), ETHER_AMOUNT);
 	}
 
-
-	/** 
-	 * @notice Test that owner can directly execute commands from an «Account»
+	/**
+	 *	@notice Test that owner can directly execute commands from an «Account»
 	 */
 	function testOwnerCanExecuteCommands() public {
 		// 1. Encode function call
 		address destination = address(usdc);
 		uint256 etherValue = 0;
-		bytes memory functionData = abi.encodeWithSelector(ERC20Mock.mint.selector, address(accountAbstractionContract), TOKENS_AMOUNT_TO_MINT);
+		bytes memory functionData =
+			abi.encodeWithSelector(ERC20Mock.mint.selector, address(accountAbstractionContract), TOKENS_AMOUNT_TO_MINT);
 
 		// 2. Create transaction struct
-		Transaction memory transaction = _createUnsignedTransaction(accountAbstractionContract.owner(), 113, destination, etherValue, functionData);
+		Transaction memory transaction =
+			_createUnsignedTransaction(accountAbstractionContract.owner(), 113, destination, etherValue, functionData);
 
 		// 3. Do call from an owner to mint mock tokens
 		vm.startPrank(accountAbstractionContract.owner());
-			accountAbstractionContract.executeTransaction(EMPTY_BYTES_32, EMPTY_BYTES_32, transaction);
+		accountAbstractionContract.executeTransaction(EMPTY_BYTES_32, EMPTY_BYTES_32, transaction);
 		vm.stopPrank();
 
 		// 4. Assert tokens amounts
 		assertEq(TOKENS_AMOUNT_TO_MINT, usdc.balanceOf(address(accountAbstractionContract)));
 	}
 
-
 	function testValidateTransaction() public {
 		// This snippet copied from the test above
 		// —
-			// 1. Encode function call
-			address destination = address(usdc);
-			uint256 etherValue = 0;
-			bytes memory functionData = abi.encodeWithSelector(ERC20Mock.mint.selector, address(accountAbstractionContract), TOKENS_AMOUNT_TO_MINT);
+		// 1. Encode function call
+		address destination = address(usdc);
+		uint256 etherValue = 0;
+		bytes memory functionData =
+			abi.encodeWithSelector(ERC20Mock.mint.selector, address(accountAbstractionContract), TOKENS_AMOUNT_TO_MINT);
 
-			// 2. Create transaction struct
-			Transaction memory transaction = _createUnsignedTransaction(accountAbstractionContract.owner(), 113, destination, etherValue, functionData);
+		// 2. Create transaction struct
+		Transaction memory transaction =
+			_createUnsignedTransaction(accountAbstractionContract.owner(), 113, destination, etherValue, functionData);
 		// —
 
 		// 3. Sign the transaction
@@ -104,18 +102,20 @@ contract AccountTest is Test {
 
 		// 4. Prank bootloader and validate transaction
 		vm.startPrank(BOOTLOADER_FORMAL_ADDRESS);
-			bytes4 magic = accountAbstractionContract.validateTransaction(EMPTY_BYTES_32, EMPTY_BYTES_32, transaction);
+		bytes4 magic = accountAbstractionContract.validateTransaction(EMPTY_BYTES_32, EMPTY_BYTES_32, transaction);
 		vm.stopPrank();
 
 		// Assert result of validation (“magic value”)
 		assertEq(magic, ACCOUNT_VALIDATION_SUCCESS_MAGIC);
 	}
 
-
-	/** 
-	 * @notice Create sign and populate Transaction struct with it
+	/**
+	 *	@notice Create sign and populate Transaction struct with it
 	 */
-	function _signTransaction(Transaction memory _transaction, address _account, uint256 _accountPrivateKey) internal returns (Transaction memory) {
+	function _signTransaction(Transaction memory _transaction, address _account, uint256 _accountPrivateKey)
+		internal
+		returns (Transaction memory)
+	{
 		// 1. Get the hash
 		bytes32 usnignedTransactionHash = MemoryTransactionHelper.encodeHash(_transaction);
 
@@ -129,11 +129,16 @@ contract AccountTest is Test {
 		return signedTransaction;
 	}
 
-
-	/** 
-	 * @notice Create Transaction struct
+	/**
+	 *	@notice Create Transaction struct
 	 */
-	function _createUnsignedTransaction(address _from, uint8 _transactionType, address _to, uint256 _value, bytes memory _data) internal view returns (Transaction memory) {
+	function _createUnsignedTransaction(
+		address _from,
+		uint8 _transactionType,
+		address _to,
+		uint256 _value,
+		bytes memory _data
+	) internal view returns (Transaction memory) {
 		uint256 gasLimit = 16777216;
 		uint256 nonce = vm.getNonce(address(accountAbstractionContract));
 		bytes32[] memory factoryDependencies = new bytes32[](0);
@@ -157,5 +162,4 @@ contract AccountTest is Test {
 			reservedDynamic: hex""
 		});
 	}
-
 }

@@ -10,10 +10,12 @@ Part of Advanced Foundry course from Cyfrin Updraft and as submodule in [appropr
 
 ### Technologies
 
+Development: Visual Studio Code  
 Programming language: Solidity  
 Environment: Foundry  
 Network: ZKsynk  
-Standards: …
+Standards: …  
+Formatting: “.editorconfig”, “.vscode/…”, Foundry, Prettier  
 
 ## State
 
@@ -33,7 +35,7 @@ Didn't deploy to ZKsync testnet because it doesn't support Foundry scripts
 
 ### Set Up
 
-Install Foundry dependences: `forge install`
+Install Foundry dependencies: `forge install`
 
 ### Use
 

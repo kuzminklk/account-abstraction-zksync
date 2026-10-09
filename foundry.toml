@@ -7,9 +7,11 @@ via-ir = true
 optimizer = true
 optimizer_runs = 200
 
-fs_permissions = [
-    { access = "read", path = "./broadcast" }
-]
+[fmt]
+style = "tab"
+tab_width = 2
+
+fs_permissions = [{ access = "read", path = "./broadcast" }]
 
 [invariant]
 runs = 128

@@ -1,4 +1,3 @@
-
 # Install foundryup-zksync
 curl -L https://raw.githubusercontent.com/matter-labs/foundry-zksync/main/install-foundry-zksync | bash
 
